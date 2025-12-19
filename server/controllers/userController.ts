@@ -1,4 +1,4 @@
-import { Request, response, Response } from "express"
+import type { Request, Response } from "express"
 import prisma from "../lib/prisma.js";
 import openai from "../configs/openai.js";
 import { role } from "better-auth/client";
@@ -6,27 +6,40 @@ import { date, optional } from "better-auth";
 import { timeStamp } from "node:console";
 import Stripe from "stripe";
 
-// Get User Credits
-export const getUserCredits = async(req: Request, res: Response) => {
-    try {
-        const userId = req.userId;
-        if(!userId) {
-            return res.status(401).json({message:'Unauthorized'})
-        }
-        const user = await prisma.user.findUnique({
-            where: {id: userId}
-        })
-        res.json({credits: user?.credits})
-    } catch (error: any) {
-         console.log(error.code || error.message);
-         res.status(500).json({message: error.message});
-    }
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+  };
 }
+
+// Get User Credits
+export const getUserCredits = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { credits: true },
+    });
+
+    return res.json({
+      credits: user?.credits ?? 20, // safety fallback
+    });
+  } catch (error) {
+    console.error("getUserCredits error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 // controller function to create new project
 
 export const createUserProject = async (req: Request, res: Response) => {
-    const userId = req.userId;
+ const userId = (req as any).user.id;
+
     try {
         const { initial_prompt } = req.body;
 
@@ -215,7 +228,8 @@ export const createUserProject = async (req: Request, res: Response) => {
 /// controller function to Get a single user project
 export const getUserProject = async(req: Request, res: Response) => {
     try {
-        const userId = req.userId;
+      const userId = (req as any).user.id;
+
         if(!userId) {
             return res.status(401).json({message:'Unauthorized'})
         }
@@ -246,7 +260,8 @@ export const getUserProject = async(req: Request, res: Response) => {
 // controller function to get all user function
 export const getUserProjects = async(req: Request, res: Response) => {
     try {
-        const userId = req.userId;
+        const userId = (req as any).user.id;
+
         if(!userId) {
             return res.status(401).json({message:'Unauthorized'})
         }
@@ -267,7 +282,8 @@ export const getUserProjects = async(req: Request, res: Response) => {
 // controller function to toggle project publish
 export const togglePublish = async(req: Request, res: Response) => {
     try {
-        const userId = req.userId;
+       const userId = (req as any).user.id;
+
         if(!userId) {
             return res.status(401).json({message:'Unauthorized'})
         }
@@ -309,7 +325,8 @@ export const purchaseCredit = async(req: Request, res: Response) => {
         enterprise: {credits: 1000, amount: 49},
      }
 
-     const userId = req.userId;
+     const userId = (req as any).user.id;
+
      const {planId} = req.body as {planId : keyof typeof plans}
      const origin = req.headers.origin as string;
 
