@@ -7,6 +7,7 @@ import userRouter from './routes/userRoutes.js';
 import projectRouter from './routes/projectRoutes.js';
 import { stripeWebhook } from './controllers/stripeWebhook.js';
 import path from 'path';
+import type { Request, Response } from 'express';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,8 +16,6 @@ const corsOptions = {
   origin: process.env.TRUSTED_ORIGINS?.split(',') || [],
   credentials: true,
 };
-
-const __dirname = path.resolve();
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(cors(corsOptions));
@@ -41,10 +40,9 @@ const rootDir = path.resolve(process.cwd(), '..');
 
 app.use(express.static(path.join(rootDir, 'client', 'dist')));
 
-app.get(/.*/, (_req, res) => {
+app.get(/.*/, (_req: Request, res: Response) => {
   res.sendFile(path.join(rootDir, 'client', 'dist', 'index.html'));
 });
-
 
 /* ---------- START SERVER ---------- */
 app.listen(port, () => {
