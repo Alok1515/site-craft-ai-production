@@ -8,19 +8,16 @@ export async function protect(
 ) {
   try {
     const session = await auth.api.getSession({
-      headers: req.headers as HeadersInit, // ✅ FIX
+      headers: req.headers as any,
     });
 
     if (!session?.user?.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Attach user to request
-    (req as any).user = session.user;
-
+    req.user = session.user; // ✅ typed now
     next();
-  } catch (error) {
-    console.error("Auth middleware error:", error);
+  } catch (err) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 }

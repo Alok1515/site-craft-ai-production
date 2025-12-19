@@ -14,25 +14,18 @@ interface AuthRequest extends Request {
 
 // Get User Credits
 export const getUserCredits = async (req: Request, res: Response) => {
-  try {
-    const userId = (req as any).user?.id;
+  const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { credits: true },
-    });
-
-    return res.json({
-      credits: user?.credits ?? 20, // safety fallback
-    });
-  } catch (error) {
-    console.error("getUserCredits error:", error);
-    return res.status(500).json({ message: "Server error" });
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { credits: true },
+  });
+
+  res.json({ credits: user?.credits ?? 20 });
 };
 
 // controller function to create new project

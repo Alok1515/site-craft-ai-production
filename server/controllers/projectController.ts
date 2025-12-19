@@ -8,7 +8,8 @@ import openai from "../configs/openai.js";
  * ============================
  */
 export const makeRevision = async (req: Request, res: Response) => {
-  const userId = req.userId;
+  const userId = req.user?.id
+
 
   try {
     if (!userId) {
@@ -186,7 +187,8 @@ export const makeRevision = async (req: Request, res: Response) => {
  */
 export const rollbackToVersion = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
+    const userId = req.user?.id
+
     const { projectId, versionId } = req.params;
 
     if (!userId) {
@@ -230,7 +232,8 @@ export const rollbackToVersion = async (req: Request, res: Response) => {
  */
 export const deleteProject = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
+    const userId = req.user?.id
+
     const { projectId } = req.params;
 
     if (!userId) {
@@ -255,7 +258,8 @@ export const deleteProject = async (req: Request, res: Response) => {
  */
 export const getProjectPreview = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
+    const userId = req.user?.id
+
     const { projectId } = req.params;
 
     if (!userId) {
@@ -327,7 +331,8 @@ export const getProjectById = async (req: Request, res: Response) => {
  */
 export const saveProjectCode = async (req: Request, res: Response) => {
   try {
-    const userId = req.userId;
+    const userId = req.user?.id
+
     const { projectId } = req.params;
     const { code } = req.body;
 
