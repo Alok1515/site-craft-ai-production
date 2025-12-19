@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import cors from 'cors'
 import 'dotenv/config'
 import path from 'path'
@@ -40,7 +40,7 @@ const clientDistPath = path.resolve(__dirname, '../../client/dist')
 
 app.use(express.static(clientDistPath))
 
-app.get('*', (_req, res) => {
+app.get(/.*/, (_req:Request, res:Response) => {
   res.sendFile(path.join(clientDistPath, 'index.html'))
 })
 
