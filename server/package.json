@@ -17,12 +17,13 @@
     "openai": "^6.10.0",
     "pg": "^8.16.3",
     "prisma": "^7.1.0",
-    "stripe": "^20.0.0"
+    "stripe": "^20.0.0",
+
+     "@types/express": "^5.0.6",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^25.0.1"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.0.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
