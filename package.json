@@ -1,0 +1,11 @@
+{
+  "name": "site-craft-ai",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "build": "npm install --prefix server && npm run build --prefix server && npm install --prefix client && npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String @id
+  email         String
+  name          String
+  totalCreation Int    @default(0)
+  credits       Int    @default(20)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  emailVerified Boolean   @default(false)
+  
+  // Relations
+  projects WebsiteProject[]
+  sessions      Session[]
+  accounts      Account[]
+  transactions Transaction[]
+
+  @@map("user")
+}
+
+model WebsiteProject {
+  id                    String  @id @default(uuid())
+  name                  String
+  initial_prompt        String
+  current_code          String?
+  current_version_index String  @default("")
+  userId                String
+  isPublished           Boolean @default(false)
+
+  // Relations
+  conversation Conversation[]
+  versions     Version[]
+  user         User           @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  user
+  assistant
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  role      Role
+  content   String
+  timestamp DateTime @default(now())
+  projectId String
+
+  // Relations
+  project WebsiteProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Version {
+  id          String   @id @default(uuid())
+  code        String
+  description String?
+  timestamp   DateTime @default(now())
+  projectId   String
+
+  // Relations
+  project WebsiteProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  isPaid    Boolean  @default(false)
+  planId    String
+  amount    Float
+  credits   Int
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}

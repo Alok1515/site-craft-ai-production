@@ -1,0 +1,19 @@
+# node
+node_modules/
+
+# env
+.env
+.env.*
+
+# build outputs
+client/dist/
+server/dist/
+
+# prisma generated
+server/generated/
+client/src/assets/schema.prisma
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
